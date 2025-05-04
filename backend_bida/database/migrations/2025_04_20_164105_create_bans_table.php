@@ -14,8 +14,8 @@ return new class extends Migration
         Schema::create('bans', function (Blueprint $table) {
             $table->id('ban_id');
             $table->string('ban_name', 50)->unique();
-            $table->enum('status', ['trống', 'đang sử dụng', 'bảo trì'])->default('trống');
-            $table->decimal('price_per_hour', 10, 2);
+            $table->integer('loai_ban')->default('1');
+            $table->integer('status')->default('1');
             $table->timestamps();
         });
     }

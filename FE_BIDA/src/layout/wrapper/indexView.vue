@@ -3,11 +3,11 @@
         <TopView></TopView>
         <div class="container-fluid py-4">
             <div class="row">
-                <div class="col-lg-8">
+                <div class="col-lg-7">
                     <!-- Hiển thị danh sách bàn -->
                     <router-view></router-view>
                 </div>
-                <div class="col-lg-4">
+                <div class="col-lg-5">
                     <!-- Hiển thị thông tin bàn đang chọn hoặc form đặt bàn -->
                     <div class="card">
                         <div class="card-body">

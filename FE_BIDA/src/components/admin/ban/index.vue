@@ -13,7 +13,7 @@
                             <tr>
                                 <th class="text-center">#</th>
                                 <th class="text-center">Tên Bàn</th>
-                                <th class="text-center">Giá Bàn(Giờ)</th>
+                                <th class="text-center">Loại Bàn</th>
                                 <th class="text-center">Trạng Thái</th>
                                 <th class="text-center">Hành Động</th>
                             </tr>
@@ -22,9 +22,13 @@
                             <tr v-for="(value, index) in tables" :key="index">
                                 <td class="text-center">{{ index + 1 }}</td>
                                 <td class="text-center">{{ value.ban_name }}</td>
-                                <td class="text-center">{{ value.price_per_hour }}</td>
                                 <td class="text-center">
-                                    <span v-if="value.status == 0" class="badge bg-success p-2">Trống</span>
+                                    <span v-if="value.loai_ban == 1">Tầng 1</span>
+                                    <span v-else-if="value.loai_ban == 2">Tầng 2</span>
+                                    <span v-else>Tầng 3</span>
+                                </td>
+                                <td class="text-center">
+                                    <span v-if="value.status == 1" class="badge bg-success p-2">Trống</span>
                                     <span v-else class="badge bg-danger p-2">Đang sử dụng</span>
                                 </td>
                                 <td class="text-center">
@@ -57,17 +61,21 @@
                             <input type="text" class="form-control" id="table_name" v-model="create_table.ban_name">
                         </div>
                         <div class="mb-3">
-                            <label for="table_status" class="form-label">Trạng thái</label>
-                            <select class="form-select" aria-label="Default select example" id="table_status"
-                                v-model="create_table.status">
-                                <option selected value="0">Trống</option>
-                                <option value="1">Đang sử dụng</option>
+                            <label for="table_type" class="form-label">Loại bàn</label>
+                            <select class="form-select" aria-label="Default select example" id="table_type"
+                                v-model="create_table.loai_ban">
+                                <option selected value="1">Tầng 1</option>
+                                <option value="2">Tầng 2</option>
+                                <option value="3">Tầng 3</option>
                             </select>
                         </div>
                         <div class="mb-3">
-                            <label for="table_price_per_hour" class="form-label">Giá Bàn(Giờ)</label>
-                            <input type="text" class="form-control" id="table_price_per_hour"
-                                v-model="create_table.price_per_hour">
+                            <label for="table_status" class="form-label">Trạng thái</label>
+                            <select class="form-select" aria-label="Default select example" id="table_status"
+                                v-model="create_table.status">
+                                <option selected value="1">Trống</option>
+                                <option value="2">Đang sử dụng</option>
+                            </select>
                         </div>
                     </form>
                 </div>
@@ -95,17 +103,21 @@
                             <input type="text" class="form-control" id="table_name" v-model="update_table.ban_name">
                         </div>
                         <div class="mb-3">
-                            <label for="table_status" class="form-label">Trạng thái</label>
-                            <select class="form-select" aria-label="Default select example" id="table_status"
-                                v-model="update_table.status">
-                                <option selected value="0">Trống</option>
-                                <option value="1">Đang sử dụng</option>
+                            <label for="table_type" class="form-label">Loại bàn</label>
+                            <select class="form-select" aria-label="Default select example" id="table_type"
+                                v-model="update_table.loai_ban">
+                                <option selected value="1">Tầng 1</option>
+                                <option value="2">Tầng 2</option>
+                                <option value="3">Tầng 3</option>
                             </select>
                         </div>
                         <div class="mb-3">
-                            <label for="table_price_per_hour" class="form-label">Giá Bàn(Giờ)</label>
-                            <input type="text" class="form-control" id="table_price_per_hour"
-                                v-model="update_table.price_per_hour">
+                            <label for="table_status" class="form-label">Trạng thái</label>
+                            <select class="form-select" aria-label="Default select example" id="table_status"
+                                v-model="update_table.status">
+                                <option selected value="1">Trống</option>
+                                <option value="2">Đang sử dụng</option>
+                            </select>
                         </div>
                     </form>
                 </div>
@@ -148,18 +160,18 @@ export default {
             tables: [],
             create_table: {
                 ban_name: '',
+                loai_ban: 1,
                 status: 1,
-                price_per_hour: ''
             },
             update_table: {
                 ban_name: '',
+                loai_ban: 1,
                 status: 1,
-                price_per_hour: ''
             },
             delete_table: {
                 ban_name: '',
+                loai_ban: 1,
                 status: 1,
-                price_per_hour: ''
             }
         }
     },
@@ -184,8 +196,8 @@ export default {
                         this.getTables();
                         this.create_table = {
                             ban_name: '',
+                            loai_ban: 1,
                             status: 1,
-                            price_per_hour: ''
                         }
                         alert(res.data.message);
                     } else {

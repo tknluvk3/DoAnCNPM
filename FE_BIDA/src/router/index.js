@@ -3,6 +3,14 @@ import { createRouter, createWebHistory } from "vue-router"; // cài vue-router:
 const routes = [
   {
     path: '/',
+    redirect: '/login', // Chuyển hướng đến trang đăng nhập
+  },
+  {
+    path: '/login',
+    component: () => import('../components/login/index.vue'), // Trang đăng nhập
+  },
+  {
+    path: '/user',
     component: () => import('../layout/wrapper/indexView.vue'),
     meta: { layout: 'user' },
     children: [
@@ -19,6 +27,15 @@ const routes = [
           default: () => import('../components/user_view/user/indexThucDon.vue'),
           detail: () => import('../components/user_view/user/BanDetail.vue')
         }
+      },
+      {
+        path: 'ban/:id',
+        name: 'BanDetail',
+        components: {
+          default: () => import('../components/user_view/user/index.vue'),
+          detail: () => import('../components/user_view/user/BanDetail.vue')
+        },
+        props: true
       },
       // Thêm các route cho user ở đây
     ]
@@ -53,4 +70,4 @@ const router = createRouter({
   routes: routes,
 });
 
-export default router
+export default router;

@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\HoaDon;
+use App\Models\Ban;
 
 class HoaDonController extends Controller
 {
@@ -13,52 +15,70 @@ class HoaDonController extends Controller
     {
         //
     }
-
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function createHoaDon(Request $request)
     {
-        //
+        $defaultNhanVienId = 1; // ID của nhân viên mặc định
+        $data = HoaDon::create([
+            'ban_id' => $request->ban_id,
+            'nhan_vien_id' => $request->nhan_vien_id ?? $defaultNhanVienId, // Sử dụng giá trị mặc định nếu không có
+            'start_time' => $request->start_time ?? now(), // Thời gian bắt đầu mặc định là hiện tại
+            'end_time' => $request->end_time,
+            'total_hours' => $request->total_hours ?? 0, // Mặc định là 0 giờ
+            'total_amount' => $request->total_amount ?? 0, // Mặc định là 0
+            'status' => $request->status ?? 1, // Mặc định là trạng thái 1
+            'payment_method' => $request->payment_method ?? 'cash', // Mặc định là thanh toán bằng tiền mặt
+        ]);
+
+        return response()->json([
+            'message' => 'Hóa đơn đã được tạo thành công',
+            'data' => $data,
+        ]);
+    }
+    public function getHoaDon(Request $request)
+    {
+        $data = HoaDon::All();
+        return response()->json([
+            'data' => $data,
+        ]);
+    }
+    public function updateHoaDon(Request $request)
+    {
+        HoaDon::where('hoa_don_id', $request->hoa_don_id)->update([
+
+            'start_time' => $request->start_time,
+            'end_time' => $request->end_time,
+            'total_hours' => $request->total_hours,
+            'total_amount' => $request->total_amount,
+            'status' => $request->status,
+            'payment_method' => $request->payment_method,
+        ]);
+        return response()->json([
+            'message' => 'Hóa đơn đã được cập nhật thành công',
+            'status' => 1,
+        ]);
+    }
+    public function deleteHoaDon(Request $request)
+    {
+        HoaDon::where('hoa_don_id', $request->hoa_don_id)->delete();
+        return response()->json([
+            'message' => 'Hóa đơn đã được xóa thành công',
+            'status' => 1,
+        ]);
+    }
+    public function updateStatus(Request $request)
+{
+    $data = Ban::find($request->ban_id);
+
+    if (!$data) {
+        return response()->json(['message' => 'Không tìm thấy bàn'], 404);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
+    $data->status = $request->status;
+    $data->save();
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
-    }
+    return response()->json(['message' => 'Cập nhật trạng thái bàn thành công']);
+}
 }

@@ -1,54 +1,50 @@
 <template>
-    <div class="container mt-3">
-        <form class="container-fluid justify-content-start mb-3">
-            <button v-for="(label, key) in categories" :key="key" class="btn me-2 rounded-pill"
-                :class="{ 'btn-outline-success active': selectedCategory === key, 'btn-outline-secondary': selectedCategory !== key }"
-                type="button" @click="filterDichVu(key)">
-                {{ label }}
+    <div class="container-fluid">
+        <!-- Phần lọc loại dịch vụ -->
+        <div class="mb-4 d-flex justify-content-center">
+            <button 
+                class="btn btn-outline-primary me-2" 
+                @click="filterLoaiDichVu('')"
+                :class="{ active: selectedLoai === '' }"
+            >
+                Tất cả
             </button>
-        </form>
-        <div class="row">
-            <template v-for="(value, index) in paginatedDichVu" :key="index">
-                <div class="col-lg-2 mb-3">
-                    <div class="card card-hover" style="cursor: pointer;" @click="openModal(value)">
-                        <div class="card-body text-center bg-primary-subtle pt-5" style="height: 120px;">
-                            <i class="fa-solid fa-champagne-glasses fs-3"></i>
-                            <h4 class="fs-5 mt-3 m-0 fst-italic text-danger">{{ formatPrice(value.price) }}</h4>
-                        </div>
-                        <div class="card-footer" style="height: 60px;">
-                            <h6 class="text-center">{{ value.name }}</h6>
-                        </div>
-                    </div>
-                </div>
-            </template>
+            <button 
+                class="btn btn-outline-primary me-2" 
+                @click="filterLoaiDichVu('gio')"
+                :class="{ active: selectedLoai === 'gio' }"
+            >
+                Giờ
+            </button>
+            <button 
+                class="btn btn-outline-primary me-2" 
+                @click="filterLoaiDichVu('nuoc')"
+                :class="{ active: selectedLoai === 'nuoc' }"
+            >
+                Nước
+            </button>
+            <button 
+                class="btn btn-outline-primary" 
+                @click="filterLoaiDichVu('thucAn')"
+                :class="{ active: selectedLoai === 'thucAn' }"
+            >
+                Thức ăn
+            </button>
         </div>
 
-        <!-- Pagination -->
-        <div class="d-flex justify-content-center mt-3">
-            <button class="btn btn-outline-secondary me-2" :disabled="currentPage === 1" @click="prevPage">Trang trước</button>
-            <span>Trang {{ currentPage }} / {{ totalPages }}</span>
-            <button class="btn btn-outline-secondary ms-2" :disabled="currentPage === totalPages" @click="nextPage">Trang sau</button>
-        </div>
-
-        <!-- Modal -->
-        <div v-if="showModal" class="modal d-block" tabindex="-1" style="background: rgba(0, 0, 0, 0.5);">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Chọn số lượng</h5>
-                        <button type="button" class="btn-close" @click="closeModal"></button>
-                    </div>
-                    <div class="modal-body">
-                        <p><strong>Dịch vụ:</strong> {{ selectedService.name }}</p>
-                        <p><strong>Giá:</strong> {{ formatPrice(selectedService.price) }}</p>
-                        <div class="mb-3">
-                            <label for="quantity" class="form-label">Số lượng:</label>
-                            <input type="number" id="quantity" v-model="quantity" class="form-control" min="1" />
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" @click="closeModal">Đóng</button>
-                        <button type="button" class="btn btn-primary" @click="addToCart">Thêm</button>
+        <!-- Danh sách dịch vụ -->
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-2 row-cols-xl-5 g-4">
+            <div v-for="item in filteredDichVu" :key="item.id" class="col">
+                <div class="card text-center shadow-sm">
+                    <div class="card-body">
+                        <!-- Hiển thị icon dựa trên loại dịch vụ -->
+                        <i v-if="item.loai_dich_vu === 'nuoc'" class="fa-solid fa-beer-mug-empty fa-3x text-primary mb-3"></i>
+                        <i v-else-if="item.loai_dich_vu === 'gio'" class="fa-solid fa-clock fa-3x text-warning mb-3"></i>
+                        <i v-else-if="item.loai_dich_vu === 'thucAn'" class="fa-solid fa-utensils fa-3x text-success mb-3"></i>
+                        
+                        <h5 class="card-title text-danger">{{ item.price.toLocaleString() }} đ</h5>
+                        <p class="card-text text-truncate">{{ item.dich_vu_name }}</p>
+                        <button class="btn btn-primary w-100" @click="orderItem(item)">Đặt món</button>
                     </div>
                 </div>
             </div>
@@ -57,109 +53,75 @@
 </template>
 
 <script>
+import axios from 'axios';
+
 export default {
     data() {
         return {
-            thucDonList: [], // Danh sách thực đơn
-            filteredThucDon: [], // Danh sách thực đơn đã lọc
-            categories: {
-                'all': 'Tất cả',
-                'nuoc': 'Nước',
-                'an': 'Ăn',
-                'khac': 'Khác'
-            },
-            selectedCategory: 'all',
-            showModal: false,
-            selectedThucDon: null,
-            quantity: 1,
-            currentPage: 1,
-            itemsPerPage: 12
-        }
-    },
-    computed: {
-        totalPages() {
-            return Math.ceil(this.filteredThucDon.length / this.itemsPerPage);
-        },
-        paginatedThucDon() {
-            const start = (this.currentPage - 1) * this.itemsPerPage;
-            const end = start + this.itemsPerPage;
-            return this.filteredThucDon.slice(start, end);
-        }
-    },
-    methods: {
-        formatPrice(price) {
-            return new Intl.NumberFormat('vi-VN', {
-                style: 'currency',
-                currency: 'VND'
-            }).format(price);
-        },
-        filterThucDon(category) {
-            this.selectedCategory = category;
-            if (category === 'all') {
-                this.filteredThucDon = this.thucDonList;
-            } else {
-                this.filteredThucDon = this.thucDonList.filter(item => item.category === category);
-            }
-            this.currentPage = 1; // Reset trang khi lọc
-        },
-        openModal(thucDon) {
-            this.selectedThucDon = thucDon;
-            this.quantity = 1;
-            this.showModal = true;
-        },
-        closeModal() {
-            this.showModal = false;
-        },
-        prevPage() {
-            if (this.currentPage > 1) {
-                this.currentPage--;
-            }
-        },
-        nextPage() {
-            if (this.currentPage < this.totalPages) {
-                this.currentPage++;
-            }
-        },
-        addToCart() {
-            if (!this.selectedThucDon) return;
-            
-            const item = {
-                ...this.selectedThucDon,
-                quantity: parseInt(this.quantity)
-            };
-            
-            // Gửi sự kiện thêm thực đơn lên component cha
-            this.$emit('add-thucdon', item);
-            
-            this.closeModal();
-        }
+            dich_vu: [], // Danh sách món ăn
+            filteredDichVu: [], // Danh sách món ăn đã lọc
+            selectedLoai: '' // Loại dịch vụ được chọn
+        };
     },
     mounted() {
-        // Gọi API để lấy danh sách thực đơn từ backend
-        this.$axios.get('http://127.0.0.1:8000/api/admin/thucdon/get-data')
-            .then(response => {
-                this.thucDonList = response.data.data;
-                this.filteredThucDon = this.thucDonList;
-            })
-            .catch(error => {
-                console.error('Lỗi khi lấy dữ liệu thực đơn:', error);
-            });
-    }
+        this.getMenuData();
+    },
+    methods: {
+        getMenuData() {
+            axios.get('http://127.0.0.1:8000/api/admin/dich-vu/get-data') // Đường dẫn API lấy danh sách dịch vụ
+                .then((res) => {
+                    this.dich_vu = res.data.data;
+                    this.filteredDichVu = this.dich_vu; // Hiển thị tất cả dịch vụ ban đầu
+                })
+                .catch(error => {
+                    console.error("Có lỗi xảy ra khi lấy dữ liệu:", error);
+                });
+        },
+        filterLoaiDichVu(loai) {
+            this.selectedLoai = loai;
+            if (loai) {
+                this.filteredDichVu = this.dich_vu.filter(item => item.loai_dich_vu === loai);
+            } else {
+                this.filteredDichVu = this.dich_vu; // Hiển thị tất cả nếu không chọn loại
+            }
+        },
+        orderItem(item) {
+            alert(`Bạn đã chọn món: ${item.dich_vu_name}`);
+            // Thêm logic đặt món tại đây
+        }
+    },
 }
 </script>
 
 <style scoped>
-.card-hover:hover {
+.card {
+    border: none;
+    background-color: #f8f9fa;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.card:hover {
     transform: translateY(-5px);
-    transition: transform 0.3s ease;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
 }
 
-.modal {
-    display: block;
+.card-title {
+    font-size: 1.25rem;
+    font-weight: bold;
 }
 
-.modal-backdrop {
-    display: none;
+.card-text {
+    font-size: 1rem;
+    color: #6c757d;
+}
+
+.btn {
+    font-size: 0.9rem;
+    font-weight: bold;
+}
+
+.btn.active {
+    background-color: #0d6efd;
+    color: white;
 }
 </style>

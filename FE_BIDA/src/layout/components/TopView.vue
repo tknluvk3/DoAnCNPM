@@ -4,14 +4,14 @@
             <div class="col-lg-7">
                 <ul class="nav nav-tabs ps-3">
                     <li class="nav-item">
-                        <router-link to="/dat-ban" class="nav-link text-white"
-                            :class="{ 'active bg-dark': $route.path === '/dat-ban' }">
+                        <router-link to="/user/dat-ban" class="nav-link text-white"
+                            :class="{ 'active bg-dark': $route.path === '/user/dat-ban' }">
                             <strong><i class="fa-solid fa-table-cells-large"></i> Phòng bàn</strong>
                         </router-link>
                     </li>
                     <li class="nav-item ms-3 me-3 ">
-                        <router-link to="/thuc-don" class="nav-link text-white"
-                            :class="{ 'active bg-dark': $route.path === '/thuc-don' }">
+                        <router-link to="/user/thuc-don" class="nav-link text-white"
+                            :class="{ 'active bg-dark': $route.path === '/user/thuc-don' }">
                             <strong><i class="fa-solid fa-utensils me-2"></i> Thực đơn</strong>
                         </router-link>
                     </li>
@@ -40,18 +40,22 @@
                         <div class="offcanvas-body">
                             <ul class="navbar-nav justify-content-end flex-grow-1 pe-3">
                                 <li class="nav-item">
-                                    <router-link to="/" class="nav-link"
+                                    <router-link to="/user" class="nav-link"
                                         :class="{ 'active': $route.path === '/' }">Home</router-link>
                                 </li>
                                 <li class="nav-item">
-                                    <router-link to="/admin/doanh-thu" class="nav-link"
-                                        :class="{ 'active': $route.path === '/admin/doanh-thu' }">Báo cáo doanh
-                                        thu</router-link>
+                                    <router-link to="/admin/" class="nav-link"
+                                    :class="{ 'active': $route.path === '/admin/' }">Quản lý</router-link>
                                 </li>
                                 <li class="nav-item">
-                                    <router-link to="/admin/quan-ly-ban" class="nav-link"
-                                        :class="{ 'active': $route.path === '/admin/quan-ly-ban' }">Quản lý
+                                    <router-link to="/admin/ban" class="nav-link"
+                                        :class="{ 'active': $route.path === '/admin/ban' }">Quản lý
                                         bàn</router-link>
+                                </li>
+                                <li class="nav-item">
+                                    <router-link to="/admin/dich-vu" class="nav-link"
+                                        :class="{ 'active': $route.path === '/admin/dich-vu' }">Quản lý
+                                        dịch vụ</router-link>
                                 </li>
                             </ul>
                         </div>

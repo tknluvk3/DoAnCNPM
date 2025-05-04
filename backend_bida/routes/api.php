@@ -4,6 +4,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\BanController;
 use App\Http\Controllers\DichVuController;
+use App\Http\Controllers\HoaDonController;
+use App\Models\Ban;
 
 Route::post("/admin/ban/create-data", [BanController::class, "createBan"]);
 Route::get("/admin/ban/get-data", [BanController::class, "getBan"]);
@@ -14,3 +16,9 @@ Route::post("/admin/dich-vu/create-data", action: [DichVuController::class, "cre
 Route::get("/admin/dich-vu/get-data", [DichVuController::class, "getDichVu"]);
 Route::post("/admin/dich-vu/update-data", [DichVuController::class, "updateDichVu"]);
 Route::post("/admin/dich-vu/delete-data", [DichVuController::class, "deleteDichVu"]);
+
+Route::post("/admin/hoa-don/create-data", [HoaDonController::class, "createHoaDon"]);
+Route::get("/admin/hoa-don/get-data", [HoaDonController::class, "getHoaDon"]);
+Route::post("/admin/hoa-don/update-data", [HoaDonController::class, "updateHoaDon"]);
+Route::post("/admin/hoa-don/delete-data", [HoaDonController::class, "deleteHoaDon"]);
+Route::post("/admin/hoa-don/update-status", [HoaDonController::class, "updateStatus"]);

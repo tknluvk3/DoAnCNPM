@@ -14,12 +14,12 @@ return new class extends Migration
         Schema::create('hoa_dons', function (Blueprint $table) {
             $table->id('hoa_don_id');
             $table->unsignedBigInteger('ban_id');
-            $table->unsignedBigInteger('nhan_vien_id');
-            $table->dateTime('start_time');
+            $table->unsignedBigInteger('nhan_vien_id')->nullable();;
+            $table->dateTime('start_time')->nullable();
             $table->dateTime('end_time')->nullable();
             $table->decimal('total_hours', 5, 2)->nullable();
             $table->decimal('charge', 10, 2)->nullable();
-            $table->decimal('total_amount', 10, 2);
+            $table->decimal('total_amount', 10, 2)->nullable();
             $table->enum('status', ['chưa thanh toán', 'đã thanh toán'])->default('chưa thanh toán');
             $table->string('payment_method', 50)->nullable();
             $table->timestamps();

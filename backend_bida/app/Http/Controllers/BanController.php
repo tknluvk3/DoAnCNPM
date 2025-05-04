@@ -33,8 +33,8 @@ class BanController extends Controller
         Ban::create([
             'ban_id' => $request->ban_id,
             'ban_name' => $request->ban_name,
+            'loai_ban' => $request->loai_ban,
             'status' => $request->status,
-            'price_per_hour' => $request->price_per_hour,
         ]);
         return response()->json([
             'message' => 'Bàn đã được tạo thành công',
@@ -44,8 +44,8 @@ class BanController extends Controller
     {
         Ban::where('ban_id', $request->ban_id)->update([
             'ban_name' => $request->ban_name,
+            'loai_ban' => $request->loai_ban,
             'status' => $request->status,
-            'price_per_hour' => $request->price_per_hour,
         ]);
         return response()->json([
             'message' => 'Bàn đã được cập nhật thành công',

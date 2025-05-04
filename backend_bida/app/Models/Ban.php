@@ -13,7 +13,7 @@ class Ban extends Model
     public $timestamps = true;
     protected $fillable = [
         'ban_name',
+        'loai_ban',
         'status',
-        'price_per_hour',
     ];
 }
