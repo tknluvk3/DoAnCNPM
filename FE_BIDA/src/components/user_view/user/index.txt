@@ -1,0 +1,96 @@
+<template>
+    <div class="card text-center">
+        <div v-if="selectedTable">
+            <div class="px-3 pt-3 d-flex justify-content-between">
+                <h4>Hóa đơn cho bàn: {{ selectedTable.name }}</h4>
+                <button class="btn btn-primary mb-3" @click="createNewBill">Thêm hóa đơn mới</button>
+            </div>
+            <div v-for="(bill, index) in bills" :key="bill.id" class="card mb-3">
+                <div class="card-header border-0 d-flex justify-content-between">
+                    <h5>Hóa đơn #{{ index + 1 }}</h5>
+                    <button class="btn btn-outline-dark rounded-pill me-2" type="button"><i
+                            class="fa-solid fa-arrow-down-wide-short"></i></button>
+                </div>
+                <div class="card-body" style="height: 600px;">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Tên dịch vụ</th>
+                                <th>Số lượng</th>
+                                <th>Đơn giá</th>
+                                <th>Thành tiền</th>
+                                <th>Hành động</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="(service, i) in bill.services" :key="service.id">
+                                <td>{{ i + 1 }}</td>
+                                <td>{{ service.name }}</td>
+                                <td v-if="service.loai === 'gio'">{{ service.quantity }} giờ</td>
+                                <td v-else>
+                                    <input type="number" class="form-control" v-model.number="service.quantity"
+                                        @change="updateQuantity(index, i, service.quantity)" min="1" />
+                                </td>
+                                <td>{{ service.price.toLocaleString() }} đ</td>
+                                <td>{{ (service.price * service.quantity).toLocaleString() }} đ</td>
+                                <td>
+                                    <button class="btn btn-sm btn-warning" v-if="service.loai === 'gio'"
+                                        @click="togglePause(index, i)">
+                                        {{ service.isPaused ? 'Tiếp tục' : 'Tạm dừng' }}
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="card-footer">
+                    <h5 class="text-end">Tổng tiền: {{ bill.totalPrice.toLocaleString() }} đ</h5>
+                    <div class="d-flex justify-content-between">
+                        <button class="btn btn-outline-primary me-2">
+                            <h4><i class="fa-solid fa-print"></i> In tạm tính</h4>
+                        </button>
+                        <button class="btn btn-primary py-2 d-grid col-6">
+                            <h4><i class="fa-solid fa-dollar-sign"></i> Thanh toán (F9)</h4>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <div v-else>
+            <div class="card text-center">
+                <div class="card-header bg-white border-0">
+                    <nav class="navbar bg-body-tertiary">
+                        <form class="container-fluid justify-content-end">
+                            <button class="btn btn-outline-dark rounded-pill me-2" type="button"><i
+                                    class="fa-solid fa-arrow-down-wide-short"></i></button>
+                        </form>
+                    </nav>
+                </div>
+                <div class="card-body text-muted d-flex flex-column justify-content-center align-items-center"
+                    style="height: 600px;">
+                    <i class="fa-solid fa-burger fa-4x mb-3 text-primary"></i>
+                    <h5 class="card-title">Chưa có món trong đơn</h5>
+                    <p class="card-text">Vui lòng chọn món trong thực đơn bên trái màn hình</p>
+                </div>
+                <div class="card-footer">
+                    <div class="d-flex justify-content-end">
+                        <h5 class="me-3 ">Tổng tiền: </h5>
+                        <h3>0</h3>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <button class="btn btn-outline-primary me-2">
+                            <h4><i class="fa-solid fa-print"></i> In tạm tính</h4>
+                        </button>
+                        <button class="btn btn-primary py-2 d-grid col-6" @click="payBill(index)">
+                            <h4><i class="fa-solid fa-dollar-sign"></i> Thanh toán (F9)</h4>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <!-- Phần view khi đã thực hiện điều kiện -->
+
+        </div>
+    </div>
+</template>
