@@ -13,6 +13,7 @@
                             <div class="mb-3">
                                 <label class="form-label">Tên món:</label>
                                 <input type="text" class="form-control" :value="selectedItem?.dich_vu_name" readonly>
+                                <small class="text-muted">ID: {{ selectedItem?.dich_vu_id }}</small>
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">Giá:</label>
@@ -141,31 +142,41 @@ export default {
         },
         confirmOrder() {
             if (!this.selectedHoaDonId) {
-                this.$toast.error('Vui lòng chọn hóa đơn');
+                alert('Vui lòng chọn hóa đơn');
                 return;
             }
 
             if (this.quantity < 1) {
-                this.$toast.error('Số lượng phải lớn hơn 0');
+                alert('Số lượng phải lớn hơn 0');
+                return;
+            }
+
+            if (!this.selectedItem || !this.selectedItem.dich_vu_id) {
+                alert('Không tìm thấy thông tin dịch vụ');
                 return;
             }
 
             // Tạo chi tiết hóa đơn mới
             const data = {
                 hoa_don_id: this.selectedHoaDonId,
-                dich_vu_id: this.selectedItem.id,
+                dich_vu_id: this.selectedItem.dich_vu_id,
                 price: this.selectedItem.price,
-                so_luong: parseInt(this.quantity)
+                so_luong: parseInt(this.quantity),
+                total: this.selectedItem.price * parseInt(this.quantity)
             };
+
+            console.log('Data gửi đi:', data); // Log để kiểm tra
 
             axios.post('http://127.0.0.1:8000/api/admin/chi-tiet-hoa-don/create-data', data)
                 .then(() => {
-                    this.$toast.success('Đã thêm món vào hóa đơn');
+                    alert('Đã thêm món vào hóa đơn');
                     this.orderModal.hide();
+                    // Emit event để thông báo cho component cha cập nhật dữ liệu
+                    this.$emit('order-added');
                 })
                 .catch(error => {
                     console.error("Lỗi khi thêm món:", error);
-                    this.$toast.error('Không thể thêm món. Vui lòng thử lại.');
+                    alert('Không thể thêm món. Vui lòng thử lại.');
                 });
         }
     }

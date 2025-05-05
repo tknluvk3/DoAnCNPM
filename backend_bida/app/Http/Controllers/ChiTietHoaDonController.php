@@ -43,7 +43,7 @@ class ChiTietHoaDonController extends Controller
         ]);
     }
     public function getChiTietHoaDon(Request $request){
-        $data = ChiTietHoaDon::with('dichVu')
+        $data = ChiTietHoaDon::with(['dichVu', 'hoaDon'])
             ->where('hoa_don_id', $request->hoa_don_id)
             ->get()
             ->map(function($item) {
@@ -51,9 +51,12 @@ class ChiTietHoaDonController extends Controller
                     'chi_tiet_hoa_don_id' => $item->chi_tiet_hoa_don_id,
                     'dich_vu_id' => $item->dich_vu_id,
                     'dich_vu_name' => $item->dichVu->dich_vu_name,
+                    'loai_dich_vu' => $item->dichVu->loai_dich_vu,
                     'quantity' => $item->quantity,
                     'price' => $item->price,
-                    'total' => $item->total
+                    'total' => $item->total,
+                    'start_time' => $item->created_at,
+                    'end_time' => $item->hoaDon->end_time
                 ];
             });
         return response()->json([

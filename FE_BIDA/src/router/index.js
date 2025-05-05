@@ -47,10 +47,10 @@ const routes = [
         path: 'dich-vu',
         component: () => import('../components/admin/dichvu/index.vue')
       },
-      // {
-      //   path: 'doanh-thu',
-      //   component: () => import('../components/admin/doanhthu/index.vue')
-      // }
+      {
+        path: 'doanh-thu',
+        component: () => import('../components/admin/doanhthu/index.vue')
+      }
     ]
   }
 ]

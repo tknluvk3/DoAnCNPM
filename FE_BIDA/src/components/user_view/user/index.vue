@@ -144,48 +144,77 @@ export default {
             return this.tableList.filter(value => value.status === 1).length;
         },
         addBill(ban) {
-            // Tạo hóa đơn mới
-            const hoaDonData = {
-                ban_id: ban.id,
-                nhan_vien_id: 1,
-                start_time: new Date().toISOString().slice(0, 19).replace('T', ' '),
-                trang_thai: 1
-            };
-
-            // Tạo hóa đơn và chi tiết hóa đơn
-            axios.post('http://127.0.0.1:8000/api/admin/hoa-don/create-data', hoaDonData)
+            // Kiểm tra hóa đơn hiện tại của bàn
+            axios.get(`http://127.0.0.1:8000/api/admin/hoa-don/get-bill-by-ban-id?ban_id=${ban.id}`)
                 .then((res) => {
-                    if (res.data.data) {
-                        const hoaDon = res.data.data;
-                        // Tạo chi tiết hóa đơn cho tiền giờ
-                        const chiTietData = {
-                            hoa_don_id: hoaDon.hoa_don_id,
-                            dich_vu_id: 1,
-                            price: 60000,
-                            so_luong: 1
-                        };
-                        return axios.post('http://127.0.0.1:8000/api/admin/chi-tiet-hoa-don/create-data', chiTietData);
+                    const hoaDonList = res.data.data || [];
+                    const hasUnpaidBill = hoaDonList.length > 0;
+                    if (hasUnpaidBill) {
+                        alert('Bàn này đang có hóa đơn chưa thanh toán. Vui lòng thanh toán trước khi tạo hóa đơn mới!');
+                        return;
                     }
-                })
-                .then(() => {
-                    alert(`Hóa đơn mới đã được tạo cho bàn: ${ban.name}`);
-                    // Cập nhật trạng thái bàn thành "đang sử dụng"
-                    return axios.post('http://127.0.0.1:8000/api/admin/hoa-don/update-status', {
+                    // Tạo hóa đơn mới
+                    const hoaDonData = {
                         ban_id: ban.id,
-                        status: 2 // Đang sử dụng
-                    });
-                })
-                .then(() => {
-                    this.getBanData(); // Cập nhật lại danh sách bàn
+                        nhan_vien_id: 1,
+                        start_time: new Date().toISOString().slice(0, 19).replace('T', ' '),
+                        status: 'chưa thanh toán'
+                    };
+                    axios.post('http://127.0.0.1:8000/api/admin/hoa-don/create-data', hoaDonData)
+                        .then((res) => {
+                            if (res.data.data) {
+                                const hoaDon = res.data.data;
+                                // Tạo chi tiết hóa đơn cho tiền giờ
+                                const chiTietData = {
+                                    hoa_don_id: hoaDon.hoa_don_id,
+                                    dich_vu_id: 1,
+                                    price: 60000,
+                                    so_luong: 1
+                                };
+                                return axios.post('http://127.0.0.1:8000/api/admin/chi-tiet-hoa-don/create-data', chiTietData);
+                            }
+                        })
+                        .then(() => {
+                            alert(`Hóa đơn mới đã được tạo cho bàn: ${ban.name}`);
+                            // Cập nhật trạng thái bàn thành "đang sử dụng"
+                            return axios.post('http://127.0.0.1:8000/api/admin/hoa-don/update-status', {
+                                ban_id: ban.id,
+                                status: 2 // Đang sử dụng
+                            });
+                        })
+                        .then(() => {
+                            this.getBanData();
+                            this.$emit('select-ban', ban);
+                        })
+                        .catch((error) => {
+                            console.error('Lỗi khi thêm hóa đơn hoặc cập nhật trạng thái bàn:', error);
+                            alert('Không thể thêm hóa đơn hoặc cập nhật trạng thái bàn. Vui lòng thử lại.');
+                        });
                 })
                 .catch((error) => {
-                    console.error('Lỗi khi thêm hóa đơn hoặc cập nhật trạng thái bàn:', error);
-                    alert('Không thể thêm hóa đơn hoặc cập nhật trạng thái bàn. Vui lòng thử lại.');
+                    console.error('Lỗi khi kiểm tra hóa đơn:', error);
+                    alert('Không thể kiểm tra hóa đơn. Vui lòng thử lại.');
                 });
         },
         viewBill(ban) {
             // Chỉ emit sự kiện để hiển thị panel xem bill
             this.$emit('select-ban', ban);
+        },
+        getHoaDonDetail() {
+            if (!this.selectedBan) return;
+            axios.get(`http://127.0.0.1:8000/api/admin/hoa-don/get-data?ban_id=${this.selectedBan.id}`)
+                .then((res) => {
+                    if (res.data.data && res.data.data.length > 0) {
+                        this.hoaDon = res.data.data[0];
+                        this.getChiTietHoaDon();
+                    } else {
+                        this.hoaDon = null;
+                        this.chiTietHoaDon = [];
+                    }
+                })
+                .catch((error) => {
+                    console.error('Lỗi khi lấy hóa đơn:', error);
+                });
         }
     }
 }

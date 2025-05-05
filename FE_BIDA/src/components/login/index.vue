@@ -2,12 +2,12 @@
     <div id="body" class="d-flex justify-content-center align-items-center">
         <div class="card bg-transparent-card p-4 shadow-lg border-0" style="max-width: 450px; width: 100%;">
             <h3 class="text-center mb-4">ĐĂNG NHẬP</h3>
-            <form>
+            <form @submit="handleLogin">
                 <div class="mb-3 border-bottom">
                     <div class="input-group mb-2">
                         <span class="input-group-text"><i class="fa-solid fa-user"></i></span>
                         <div class="form-floating">
-                            <input type="text" class="form-control" id="floatingInputGroup1">
+                            <input type="text" class="form-control" id="floatingInputGroup1" v-model="username" required>
                             <label for="floatingInputGroup1">Tên đăng nhập</label>
                         </div>
                     </div>
@@ -16,32 +16,31 @@
                     <div class="input-group mb-2">
                         <span class="input-group-text"><i class="fa-solid fa-lock"></i></span>
                         <div class="form-floating">
-                            <input type="password" class="form-control" id="floatingInputGroup2">
+                            <input type="password" class="form-control" id="floatingInputGroup2" v-model="password" required>
                             <label for="floatingInputGroup2">Mật khẩu</label>
                         </div>
                     </div>
                 </div>
                 <div class="d-flex justify-content-between mb-3 small">
                     <div class="form-check">
-                        <input type="checkbox" class="form-check-input" id="remember">
+                        <input type="checkbox" class="form-check-input" id="remember" v-model="remember">
                         <label class="form-check-label" for="remember">Ghi nhớ</label>
                     </div>
                     <a href="#">Quên mật khẩu?</a>
                 </div>
+                <div v-if="error" class="alert alert-danger py-2">{{ error }}</div>
                 <div class="row mb-3">
                     <div class="col-6">
-                        <router-link to="/admin/dashboard" class="text-decoration-none">
-                            <button type="button" class="btn btn-primary w-100">
-                                <i class="fa-solid fa-user-tie me-2"></i>Quản lý
-                            </button>
-                        </router-link>
+                        <button type="button" class="btn btn-primary w-100" @click="handleLogin('admin')" :disabled="loading">
+                            <span v-if="loadingType==='admin' && loading" class="spinner-border spinner-border-sm me-2"></span>
+                            <i class="fa-solid fa-user-tie me-2"></i>Quản lý
+                        </button>
                     </div>
                     <div class="col-6">
-                        <router-link to="/user/dat-ban" class="text-decoration-none">
-                            <button type="button" class="btn btn-success w-100">
-                                <i class="fa-solid fa-cash-register me-2"></i>Bán hàng
-                            </button>
-                        </router-link>
+                        <button type="button" class="btn btn-success w-100" @click="handleLogin('user')" :disabled="loading">
+                            <span v-if="loadingType==='user' && loading" class="spinner-border spinner-border-sm me-2"></span>
+                            <i class="fa-solid fa-cash-register me-2"></i>Bán hàng
+                        </button>
                     </div>
                 </div>
             </form>
@@ -51,8 +50,54 @@
 </template>
 
 <script>
+import axios from 'axios';
+
 export default {
-    name: 'LoginPage'
+    name: 'LoginPage',
+    data() {
+        return {
+            username: '',
+            password: '',
+            error: '',
+            loading: false,
+            loadingType: '', // 'admin' hoặc 'user'
+            remember: false
+        }
+    },
+    methods: {
+        async handleLogin(type) {
+            this.error = '';
+            this.loading = true;
+            this.loadingType = type;
+            try {
+                const res = await axios.post('http://127.0.0.1:8000/api/login', {
+                    username: this.username,
+                    password: this.password
+                });
+                if (res.data.status === 1) {
+                    const userData = res.data.data;
+                    if (this.remember) {
+                        localStorage.setItem('user', JSON.stringify(userData));
+                    } else {
+                        sessionStorage.setItem('user', JSON.stringify(userData));
+                    }
+                    // Chuyển hướng theo nút bấm
+                    if (type === 'admin') {
+                        this.$router.push('/admin/dashboard');
+                    } else {
+                        this.$router.push('/user/dat-ban');
+                    }
+                } else {
+                    this.error = res.data.message || 'Đăng nhập thất bại';
+                }
+            } catch (err) {
+                this.error = err.response?.data?.message || 'Đăng nhập thất bại';
+            } finally {
+                this.loading = false;
+                this.loadingType = '';
+            }
+        }
+    }
 }
 </script>
 

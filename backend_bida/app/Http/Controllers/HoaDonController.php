@@ -69,16 +69,36 @@ class HoaDonController extends Controller
         ]);
     }
     public function updateStatus(Request $request)
-{
-    $data = Ban::find($request->ban_id);
+    {
+        $data = Ban::find($request->ban_id);
 
-    if (!$data) {
-        return response()->json(['message' => 'Không tìm thấy bàn'], 404);
+        if (!$data) {
+            return response()->json(['message' => 'Không tìm thấy bàn'], 404);
+        }
+
+        $data->status = $request->status;
+        $data->save();
+
+        return response()->json(['message' => 'Cập nhật trạng thái bàn thành công']);
     }
+    public function updateEndTime(Request $request)
+    {
+        $data = HoaDon::find($request->hoa_don_id);
+        if ($data) {
+            $data->end_time = $request->end_time;
+            $data->save();
+            return response()->json(['message' => 'Cập nhật end_time thành công']);
+        }
+        return response()->json(['message' => 'Không tìm thấy hóa đơn'], 404);
+    }
+    public function getBillByBanId(Request $request)
+    {
+        $ban_id = $request->ban_id;
+        $bill = \App\Models\HoaDon::where('ban_id', $ban_id)
+            ->where('status', 'chưa thanh toán')
+            ->orderBy('hoa_don_id', 'desc')
+            ->first();
 
-    $data->status = $request->status;
-    $data->save();
-
-    return response()->json(['message' => 'Cập nhật trạng thái bàn thành công']);
-}
+        return response()->json(['data' => $bill ? [$bill] : []]);
+    }
 }

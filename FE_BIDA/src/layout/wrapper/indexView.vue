@@ -37,10 +37,7 @@
                                 <h5 class="me-3">Tổng tiền:</h5>
                                 <h3>0</h3>
                             </div>
-                            <div class="d-flex justify-content-between">
-                                <button class="btn btn-outline-primary me-2">
-                                    <h4><i class="fa-solid fa-print"></i> In tạm tính</h4>
-                                </button>
+                            <div class="d-flex justify-content-end">
                                 <button class="btn btn-primary py-2 d-grid col-6" @click="payBill">
                                     <h4><i class="fa-solid fa-dollar-sign"></i> Thanh toán (F9)</h4>
                                 </button>

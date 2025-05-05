@@ -19,9 +19,14 @@ class ChiTietHoaDon extends Model
         'quantity',
         'price',
         'total',
+        'end_time'
     ];
 
     public function dichVu() {
         return $this->belongsTo(DichVu::class, 'dich_vu_id', 'dich_vu_id');
+    }
+
+    public function hoaDon() {
+        return $this->belongsTo(HoaDon::class, 'hoa_don_id', 'hoa_don_id');
     }
 }

@@ -21,7 +21,7 @@
             </div>
             <div class="col-lg-5 d-flex justify-content-between">
                 <ul class="">
-
+                    
                 </ul>
                 <div class="me-3 mt-1">
                     <span class="text-white">thungan</span>
@@ -56,6 +56,10 @@
                                     <router-link to="/admin/dich-vu" class="nav-link"
                                         :class="{ 'active': $route.path === '/admin/dich-vu' }">Quản lý
                                         dịch vụ</router-link>
+                                </li>
+                                <li class="nav-item">
+                                    <router-link to="/login" class="nav-link"
+                                        :class="{ 'active': $route.path === '/login' }">Đăng xuất</router-link>
                                 </li>
                             </ul>
                         </div>
