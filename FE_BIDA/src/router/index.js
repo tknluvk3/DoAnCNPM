@@ -28,16 +28,6 @@ const routes = [
           detail: () => import('../components/user_view/user/BanDetail.vue')
         }
       },
-      {
-        path: 'ban/:id',
-        name: 'BanDetail',
-        components: {
-          default: () => import('../components/user_view/user/index.vue'),
-          detail: () => import('../components/user_view/user/BanDetail.vue')
-        },
-        props: true
-      },
-      // Thêm các route cho user ở đây
     ]
   },
   {

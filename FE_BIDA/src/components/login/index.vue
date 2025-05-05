@@ -7,7 +7,7 @@
                     <div class="input-group mb-2">
                         <span class="input-group-text"><i class="fa-solid fa-user"></i></span>
                         <div class="form-floating">
-                            <input type="text" class="form-control" id="floatingInputGroup1" placeholder="Username">
+                            <input type="text" class="form-control" id="floatingInputGroup1">
                             <label for="floatingInputGroup1">Tên đăng nhập</label>
                         </div>
                     </div>
@@ -16,8 +16,8 @@
                     <div class="input-group mb-2">
                         <span class="input-group-text"><i class="fa-solid fa-lock"></i></span>
                         <div class="form-floating">
-                            <input type="password" class="form-control" id="floatingInputGroup2" placeholder="Username">
-                            <label for="floatingInputGroup1">Mật khẩu</label>
+                            <input type="password" class="form-control" id="floatingInputGroup2">
+                            <label for="floatingInputGroup2">Mật khẩu</label>
                         </div>
                     </div>
                 </div>
@@ -28,72 +28,86 @@
                     </div>
                     <a href="#">Quên mật khẩu?</a>
                 </div>
-                <router-link to="/user/dat-ban">
-                    <button type="submit" class="btn btn-login w-100 mb-3 text-white">Đăng nhập</button>
-                </router-link>
+                <div class="row mb-3">
+                    <div class="col-6">
+                        <router-link to="/admin/dashboard" class="text-decoration-none">
+                            <button type="button" class="btn btn-primary w-100">
+                                <i class="fa-solid fa-user-tie me-2"></i>Quản lý
+                            </button>
+                        </router-link>
+                    </div>
+                    <div class="col-6">
+                        <router-link to="/user/dat-ban" class="text-decoration-none">
+                            <button type="button" class="btn btn-success w-100">
+                                <i class="fa-solid fa-cash-register me-2"></i>Bán hàng
+                            </button>
+                        </router-link>
+                    </div>
+                </div>
             </form>
-            <p class="text-center mt-4 small">© 2025 Mini Billiards</p>
+            <p class="text-center mt-4 small text-muted"> 2025 Mini Billiards</p>
         </div>
     </div>
-    
 </template>
+
 <script>
 export default {
-    
+    name: 'LoginPage'
 }
 </script>
-<style>
-        div#body {
-            background-image: url('https://wallpaper.forfun.com/fetch/bd/bde7eac9a18117733c7c7e3ec08c10df.jpeg');
-            background-size: cover;
-            background-position: center;
-            min-height: 100vh;
-        }
 
-        .bg-transparent-card {
-            background-color: rgba(0, 0, 0, 0.4);
-            /* Nền đen trong suốt */
-            border: 0px solid rgba(255, 255, 255, 0);
-            border-radius: 1rem;
-            color: #fff;
-        }
+<style scoped>
+#body {
+    background-image: url('https://wallpaper.forfun.com/fetch/bd/bde7eac9a18117733c7c7e3ec08c10df.jpeg');
+    min-height: 100vh;
+    background-size: cover;
+    background-position: center;
+}
 
-        .form-control {
-            background-color: transparent;
-            color: #fff;
-            border: 1px solid rgba(255, 255, 255, 0);
-        }
+.bg-transparent-card {
+    background-color: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+}
 
-        .form-control::placeholder {
-            color: rgba(255, 255, 255, 0);
-        }
-        .input-group-text{
-            background-color: transparent;
-            color: #fff;
-            border: 1px solid rgba(255, 255, 255, 0);
-        }
-        .form-control:focus {
-            background-color: transparent;
-            color: #fff;
-            box-shadow: none;
-            border-color: #fff;
-        }
+.input-group-text {
+    background-color: transparent;
+    border: none;
+    color: #6c757d;
+}
 
-        .btn-login {
-            background-color: #ff4d6d;
-            border: none;
-        }
+.form-control {
+    border: none;
+    border-radius: 0;
+    background-color: transparent;
+}
 
-        .btn-login:hover {
-            background-color: #ff2e52;
-        }
+.form-control:focus {
+    box-shadow: none;
+    background-color: transparent;
+}
 
-        a {
-            color: #fff;
-        }
+.btn {
+    padding: 0.75rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
 
-        a:hover {
-            color: #ff4d6d;
-        }
+.border-bottom {
+    border-color: #dee2e6 !important;
+}
 
+.form-check-input:checked {
+    background-color: #198754;
+    border-color: #198754;
+}
+
+a {
+    color: #6c757d;
+    text-decoration: none;
+}
+
+a:hover {
+    color: #198754;
+}
 </style>

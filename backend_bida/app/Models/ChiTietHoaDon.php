@@ -20,4 +20,8 @@ class ChiTietHoaDon extends Model
         'price',
         'total',
     ];
+
+    public function dichVu() {
+        return $this->belongsTo(DichVu::class, 'dich_vu_id', 'dich_vu_id');
+    }
 }

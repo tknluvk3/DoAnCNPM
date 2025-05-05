@@ -74,11 +74,11 @@
                                     </div>
                                 </div>
                                 <div class="mt-3 d-flex justify-content-end">
-                                    <button v-if="ban.status == 2" class="btn btn-primary btn-sm" @click="viewBill(ban)">
-                                        Xem Bill
-                                    </button>
-                                    <button v-else class="btn btn-success btn-sm" @click="addBill(ban)">
+                                    <button v-if="ban.status != 2" class="btn btn-success btn-sm" @click="addBill(ban)">
                                         Thêm Bill
+                                    </button>
+                                    <button v-else class="btn btn-primary btn-sm" @click="viewBill(ban)">
+                                        Xem Bill
                                     </button>
                                 </div>
                             </div>
@@ -92,13 +92,12 @@
 
 <script>
 import axios from 'axios';
-
 export default {
     data() {
         return {
-            tableList: [], // Danh sách bàn
-            filteredTang: [], // Danh sách bàn đã lọc
-            loading: false // Trạng thái loading
+            tableList: [], 
+            filteredTang: [], 
+            loading: false
         }
     },
     mounted() {
@@ -115,7 +114,8 @@ export default {
                             id: item.ban_id,
                             name: item.ban_name,
                             tang: item.loai_ban,
-                            status: item.status
+                            status: item.status,
+                            hoa_don_id: item.hoa_don_id
                         }));
                         this.filteredTang = this.tableList;
                     }
@@ -144,29 +144,48 @@ export default {
             return this.tableList.filter(value => value.status === 1).length;
         },
         addBill(ban) {
-            axios.post('http://127.0.0.1:8000/api/admin/hoa-don/create-data', {
+            // Tạo hóa đơn mới
+            const hoaDonData = {
                 ban_id: ban.id,
-                nhan_vien_id: 1, // ID nhân viên mặc định
-                status: 1 // Trạng thái hóa đơn mới
-            })
-            .then((res) => {
-                alert(`Hóa đơn mới đã được tạo cho bàn: ${ban.name}`);
-                // Cập nhật trạng thái bàn thành "đang sử dụng"
-                return axios.post('http://127.0.0.1:8000/api/admin/hoa-don/update-status', {
-                    ban_id: ban.id,
-                    status: 2 // Đang sử dụng
+                nhan_vien_id: 1,
+                start_time: new Date().toISOString().slice(0, 19).replace('T', ' '),
+                trang_thai: 1
+            };
+
+            // Tạo hóa đơn và chi tiết hóa đơn
+            axios.post('http://127.0.0.1:8000/api/admin/hoa-don/create-data', hoaDonData)
+                .then((res) => {
+                    if (res.data.data) {
+                        const hoaDon = res.data.data;
+                        // Tạo chi tiết hóa đơn cho tiền giờ
+                        const chiTietData = {
+                            hoa_don_id: hoaDon.hoa_don_id,
+                            dich_vu_id: 1,
+                            price: 60000,
+                            so_luong: 1
+                        };
+                        return axios.post('http://127.0.0.1:8000/api/admin/chi-tiet-hoa-don/create-data', chiTietData);
+                    }
+                })
+                .then(() => {
+                    alert(`Hóa đơn mới đã được tạo cho bàn: ${ban.name}`);
+                    // Cập nhật trạng thái bàn thành "đang sử dụng"
+                    return axios.post('http://127.0.0.1:8000/api/admin/hoa-don/update-status', {
+                        ban_id: ban.id,
+                        status: 2 // Đang sử dụng
+                    });
+                })
+                .then(() => {
+                    this.getBanData(); // Cập nhật lại danh sách bàn
+                })
+                .catch((error) => {
+                    console.error('Lỗi khi thêm hóa đơn hoặc cập nhật trạng thái bàn:', error);
+                    alert('Không thể thêm hóa đơn hoặc cập nhật trạng thái bàn. Vui lòng thử lại.');
                 });
-            })
-            .then(() => {
-                this.getBanData(); // Cập nhật lại danh sách bàn
-            })
-            .catch((error) => {
-                console.error('Lỗi khi thêm hóa đơn hoặc cập nhật trạng thái bàn:', error);
-                alert('Không thể thêm hóa đơn hoặc cập nhật trạng thái bàn. Vui lòng thử lại.');
-            });
         },
         viewBill(ban) {
-            this.$router.push({ name: 'BanDetail', params: { id: ban.id } });
+            // Chỉ emit sự kiện để hiển thị panel xem bill
+            this.$emit('select-ban', ban);
         }
     }
 }
