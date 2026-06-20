@@ -29,7 +29,7 @@
                                     <option v-for="hoaDon in danhSachHoaDon" 
                                             :key="hoaDon.hoa_don_id" 
                                             :value="hoaDon.hoa_don_id">
-                                        Hóa đơn #{{ hoaDon.hoa_don_id }} - Bàn {{ hoaDon.ban_id }}
+                                        Bill #{{ hoaDon.hoa_don_id }} - ID bàn: {{ hoaDon.ban_id }}
                                     </option>
                                 </select>
                             </div>

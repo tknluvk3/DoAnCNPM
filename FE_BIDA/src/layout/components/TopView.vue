@@ -24,7 +24,7 @@
                     
                 </ul>
                 <div class="me-3 mt-1">
-                    <span class="text-white">thungan</span>
+                    <span class="text-white">Quản Lý</span>
                     <button class="navbar-toggler bg-body-tertiary p-0" type="button" data-bs-toggle="offcanvas"
                         data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar"
                         aria-label="Toggle navigation">

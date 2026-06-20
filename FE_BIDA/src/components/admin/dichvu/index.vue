@@ -136,22 +136,23 @@
 <script>
 import axios from 'axios'
 export default {
+    // Khai báo dữ liệu
     data() {
         return {
-            services: [],
-            create_dich_vu: {
+            services: [], // Mảng chứa danh sách dịch vụ
+            create_dich_vu: { // Object chứa thông tin dịch vụ mới
                 dich_vu_name: '',
                 loai_dich_vu: '',
                 price: '',
                 description: '',
             },
-            update_dich_vu: {
+            update_dich_vu: { // Object chứa thông tin dịch vụ cần cập nhật
                 dich_vu_name: '',
                 loai_dich_vu: '',
                 price: '',
                 description: '',
             },
-            delete_dich_vu: {
+            delete_dich_vu: { // Object chứa thông tin dịch vụ cần xóa
                 dich_vu_name: '',
                 loai_dich_vu: '',
                 price: '',
@@ -160,6 +161,7 @@ export default {
         }
     },
     methods: {
+        // Lấy danh sách dịch vụ từ API
         getServices() {
             axios.get('http://127.0.0.1:8000/api/admin/dich-vu/get-data')
                 .then((res) => {
@@ -170,11 +172,14 @@ export default {
                     console.error('Get services error:', error);
                 });
         },
+
+        // Tạo dịch vụ mới
         createDichVu() {
             axios.post('http://127.0.0.1:8000/api/admin/dich-vu/create-data', this.create_dich_vu)
                 .then((res) => {
                     if (res.data.status) {
-                        this.getServices();
+                        this.getServices(); // Cập nhật lại danh sách sau khi tạo thành công
+                        // Reset form
                         this.create_dich_vu = {
                             dich_vu_name: '',
                             loai_dich_vu: '',
@@ -190,11 +195,13 @@ export default {
                     console.error(error);
                 });
         },
+
+        // Cập nhật thông tin dịch vụ
         updateDichVu() {
             axios.post('http://127.0.0.1:8000/api/admin/dich-vu/update-data', this.update_dich_vu)
                 .then((res) => {
                     if (res.data.status) {
-                        this.getServices();
+                        this.getServices(); // Cập nhật lại danh sách sau khi sửa thành công
                         alert(res.data.message);
                     } else {
                         alert(res.data.message);
@@ -204,11 +211,13 @@ export default {
                     console.error('Update error:', error);
                 });
         },
+
+        // Xóa dịch vụ
         deleteDichVu() {
             axios.post('http://127.0.0.1:8000/api/admin/dich-vu/delete-data', this.delete_dich_vu)
                 .then((res) => {
                     if(res.data.status){
-                        this.getServices();
+                        this.getServices(); // Cập nhật lại danh sách sau khi xóa thành công
                         alert(res.data.message);
                     }else{
                         alert(res.data.message);
@@ -219,6 +228,7 @@ export default {
                 });
         },
     },
+    // Gọi API lấy danh sách dịch vụ khi component được tạo
     mounted() {
         this.getServices();
     }

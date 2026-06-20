@@ -157,17 +157,21 @@ import axios from 'axios'
 export default {
     data() {
         return {
+            // Mảng chứa danh sách các bàn
             tables: [],
+            // Đối tượng lưu thông tin bàn mới khi tạo
             create_table: {
                 ban_name: '',
                 loai_ban: 1,
                 status: 1,
             },
+            // Đối tượng lưu thông tin bàn khi cập nhật
             update_table: {
                 ban_name: '',
                 loai_ban: 1,
                 status: 1,
             },
+            // Đối tượng lưu thông tin bàn khi xóa
             delete_table: {
                 ban_name: '',
                 loai_ban: 1,
@@ -175,24 +179,28 @@ export default {
             }
         }
     },
+    // Gọi API lấy danh sách bàn khi component được tạo
     mounted() {
         this.getTables();
     },
     methods: {
+        // Lấy danh sách bàn từ API
         getTables() {
             axios.get('http://127.0.0.1:8000/api/admin/ban/get-data')
                 .then((res) => {
-                    console.log('API response:', res.data);
+                    console.log('API response:', res.data.data[0].ban_name);
                     this.tables = res.data.data;
                 })
                 .catch((error) => {
                     console.error('API error:', error);
                 })
         },
+        // Tạo bàn mới
         createTable() {
             axios.post('http://127.0.0.1:8000/api/admin/ban/create-data', this.create_table)
                 .then((res) => {
                     if (res.data.status) {
+                        // Nếu tạo thành công, cập nhật lại danh sách và reset form
                         this.getTables();
                         this.create_table = {
                             ban_name: '',
@@ -208,10 +216,12 @@ export default {
                     console.log(error);
                 });
         },
+        // Cập nhật thông tin bàn
         updateTable() {
             axios.post('http://127.0.0.1:8000/api/admin/ban/update-data', this.update_table)
                 .then((res) => {
                     if (res.data.status) {
+                        // Nếu cập nhật thành công, cập nhật lại danh sách
                         this.getTables();
                         alert(res.data.message);
                     } else {
@@ -222,10 +232,12 @@ export default {
                     console.log(error);
                 });
         },
+        // Xóa bàn
         deleteTable() {
             axios.post('http://127.0.0.1:8000/api/admin/ban/delete-data', this.delete_table)
                 .then((res) => {
                     if (res.data.status) {
+                        // Nếu xóa thành công, cập nhật lại danh sách
                         this.getTables();
                         alert(res.data.message);
                     } else {

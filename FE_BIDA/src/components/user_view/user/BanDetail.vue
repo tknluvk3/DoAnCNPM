@@ -215,6 +215,10 @@ export default {
         }
     },
     methods: {
+        // Hàm định dạng thời gian
+        // @param time: thời gian cần định dạng
+        // @param format: định dạng thời gian ('full' hoặc 'HH:mm')
+        // @return: chuỗi thời gian đã định dạng
         formatTime(time, format = 'full') {
             if (!time) return '';
             const date = new Date(time);
@@ -241,48 +245,58 @@ export default {
         },
 
         getChiTietHoaDon() {
+            // Kiểm tra xem có hóa đơn không
             if (this.hoaDon) {
                 const hoaDonId = this.hoaDon.hoa_don_id;
+                // Gọi API lấy chi tiết hóa đơn theo ID
                 axios.get(`http://127.0.0.1:8000/api/admin/chi-tiet-hoa-don/get-data?hoa_don_id=${hoaDonId}`)
                     .then((res) => {
                         if (res.data.data) {
+                            // Map dữ liệu trả về thành mảng chi tiết hóa đơn
                             this.chiTietHoaDon = res.data.data.map(item => {
-                                // Xử lý cho loại giờ
+                                // Xử lý cho loại dịch vụ tính theo giờ
                                 if (item.loai_dich_vu === 'gio') {
                                     const startTime = new Date(item.start_time);
                                     const now = new Date();
-                                    const elapsed = (now - startTime) / 3600000; // số giờ
-                                    const elapsedHour = Math.round(elapsed * 10) / 10; // làm tròn 1 chữ số sau dấu phẩy
+                                    // Tính số giờ đã trôi qua
+                                    const elapsed = (now - startTime) / 3600000; // Chuyển ms sang giờ
+                                    // Làm tròn đến 1 chữ số thập phân
+                                    const elapsedHour = Math.round(elapsed * 10) / 10;
                                     return {
                                         ...item,
                                         elapsedHour,
-                                        elapsedHourDisplay: elapsedHour.toFixed(1),
-                                        isRunning: true
+                                        elapsedHourDisplay: elapsedHour.toFixed(1), // Hiển thị 1 số sau dấu phẩy
+                                        isRunning: true // Mặc định timer đang chạy
                                     };
                                 }
-                                // Các loại khác giữ nguyên
+                                // Xử lý cho các loại dịch vụ khác
                                 return {
                                     ...item,
-                                    quantity: item.so_luong || 1,
-                                    dich_vu_name: item.dich_vu_name || `Dịch vụ #${item.dich_vu_id}`,
-                                    loai_dich_vu: item.loai_dich_vu
+                                    quantity: item.so_luong || 1, // Số lượng mặc định là 1
+                                    dich_vu_name: item.dich_vu_name || `Dịch vụ #${item.dich_vu_id}`, // Tên dịch vụ
+                                    loai_dich_vu: item.loai_dich_vu // Loại dịch vụ
                                 };
                             });
-                            // Khởi động timer cho các dịch vụ giờ
+                            // Bắt đầu đếm thời gian cho các dịch vụ tính giờ
                             this.startAllTimers();
                         } else {
+                            // Nếu không có dữ liệu thì gán mảng rỗng
                             this.chiTietHoaDon = [];
                         }
                     })
                     .catch((error) => {
+                        // Xử lý lỗi khi gọi API
                         console.error('Lỗi khi lấy chi tiết hóa đơn:', error);
                     });
             }
         },
+        // Tăng số lượng dịch vụ lên 1 đơn vị
         increaseQuantity(item) {
             item.quantity++;
             this.updateChiTietHoaDon(item);
         },
+
+        // Giảm số lượng dịch vụ xuống 1 đơn vị nếu số lượng > 1
         decreaseQuantity(item) {
             if (item.quantity > 1) {
                 item.quantity--;
@@ -304,6 +318,10 @@ export default {
                 this.getChiTietHoaDon();
             });
         },
+        // Tính tổng tiền của hóa đơn
+        // Duyệt qua từng item trong chiTietHoaDon
+        // Nếu là dịch vụ tính giờ thì lấy giá * số giờ đã sử dụng
+        // Nếu là dịch vụ thông thường thì lấy giá * số lượng
         calculateTotal() {
             return this.chiTietHoaDon.reduce((total, item) => {
                 if (item.loai_dich_vu === 'gio') {
@@ -313,11 +331,13 @@ export default {
             }, 0);
         },
         payBill() {
+            // Hàm thanh toán hóa đơn
             if (this.hoaDon) {
                 // Implement payment logic here
             }
         },
         formatElapsed(item) {
+            // Hàm định dạng thời gian đã trôi qua
             if (!item.start_time || !item.elapsedHour) return '';
             const startDate = new Date(item.start_time);
             const endDate = new Date();
@@ -327,6 +347,7 @@ export default {
             return `${elapsedHours} giờ ${remainingMinutes} phút`;
         },
         toggleTimer(item) {
+            // Hàm bật/tắt đồng hồ tính giờ
             item.isRunning = !item.isRunning;
             if (item.isRunning) {
                 this.startTimer(item);
@@ -357,6 +378,7 @@ export default {
             }
         },
         startAllTimers() {
+            // Hàm bắt đầu tất cả đồng hồ tính giờ
             this.chiTietHoaDon.forEach(item => {
                 if (item.loai_dich_vu === 'gio' && item.isRunning) {
                     this.startTimer(item);
@@ -364,6 +386,7 @@ export default {
             });
         },
         startTimer(item) {
+            // Hàm bắt đầu đồng hồ tính giờ cho một dịch vụ
             if (this.timerIntervals[item.chi_tiet_hoa_don_id]) return;
             this.timerIntervals[item.chi_tiet_hoa_don_id] = setInterval(() => {
                 const now = new Date();
@@ -374,10 +397,12 @@ export default {
             }, 1000);
         },
         stopTimer(item) {
+            // Hàm dừng đồng hồ tính giờ cho một dịch vụ
             clearInterval(this.timerIntervals[item.chi_tiet_hoa_don_id]);
             this.timerIntervals[item.chi_tiet_hoa_don_id] = null;
         },
         deleteChiTietHoaDon(item) {
+            // Hàm xóa một chi tiết hóa đơn
             if (confirm('Bạn có chắc muốn xóa dịch vụ này khỏi hóa đơn?')) {
                 axios.post('http://127.0.0.1:8000/api/admin/chi-tiet-hoa-don/delete-data', {
                     chi_tiet_hoa_don_id: item.chi_tiet_hoa_don_id
@@ -392,6 +417,7 @@ export default {
             }
         },
         handlePayBill() {
+            // Hàm xử lý thanh toán hóa đơn
             // Kiểm tra có dịch vụ giờ nào đang chạy không
             const isAnyTimerRunning = this.chiTietHoaDon.some(
                 item => item.loai_dich_vu === 'gio' && item.isRunning
@@ -407,6 +433,7 @@ export default {
             }
         },
         confirmStopTimer() {
+            // Hàm xác nhận dừng đồng hồ tính giờ
             // Dừng tất cả timer dịch vụ giờ đang chạy
             this.chiTietHoaDon.forEach(item => {
                 if (item.loai_dich_vu === 'gio' && item.isRunning) {
@@ -437,6 +464,7 @@ export default {
             }, 300);
         },
         formatDateTime(date) {
+            // Hàm định dạng ngày giờ
             const pad = n => n < 10 ? '0' + n : n;
             return date.getFullYear() + '-' +
                 pad(date.getMonth() + 1) + '-' +
@@ -446,6 +474,7 @@ export default {
                 pad(date.getSeconds());
         },
         confirmPayBill() {
+            // Hàm xác nhận thanh toán hóa đơn
             axios.post('http://127.0.0.1:8000/api/admin/hoa-don/update-data', {
                 hoa_don_id: this.hoaDon.hoa_don_id,
                 total_amount: this.calculateTotal(),

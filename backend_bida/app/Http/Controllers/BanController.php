@@ -28,6 +28,12 @@ class BanController extends Controller
     /**
      * Store a newly created resource in storage.
      */
+    /**
+     * Tạo bàn mới
+     * 
+     * @param Request $request Chứa thông tin bàn cần tạo
+     * @return JsonResponse Trả về thông báo kết quả
+     */
     public function createBan(Request $request)
     {
         Ban::create([
@@ -40,6 +46,13 @@ class BanController extends Controller
             'message' => 'Bàn đã được tạo thành công',
         ]);
     }
+
+    /**
+     * Cập nhật thông tin bàn
+     * 
+     * @param Request $request Chứa thông tin bàn cần cập nhật
+     * @return JsonResponse Trả về thông báo kết quả
+     */
     public function updateBan(Request $request)
     {
         Ban::where('ban_id', $request->ban_id)->update([
@@ -52,6 +65,13 @@ class BanController extends Controller
             'status' => 1,
         ]);
     }
+
+    /**
+     * Xóa bàn
+     * 
+     * @param Request $request Chứa ID bàn cần xóa
+     * @return JsonResponse Trả về thông báo kết quả
+     */
     public function deleteBan(Request $request)
     {
         Ban::where('ban_id', $request->ban_id)->delete();

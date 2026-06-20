@@ -91,14 +91,24 @@ class HoaDonController extends Controller
         }
         return response()->json(['message' => 'Không tìm thấy hóa đơn'], 404);
     }
+    /**
+     * Lấy thông tin hóa đơn theo ID bàn
+     * 
+     * @param Request $request Chứa ban_id cần tìm hóa đơn
+     * @return JsonResponse Trả về hóa đơn chưa thanh toán của bàn
+     */
     public function getBillByBanId(Request $request)
     {
-        $ban_id = $request->ban_id;
-        $bill = \App\Models\HoaDon::where('ban_id', $ban_id)
+        // Lấy ID bàn từ request
+        $data = $request->ban_id;
+
+        // Tìm hóa đơn chưa thanh toán mới nhất của bàn
+        $bill = HoaDon::where('ban_id', $data)
             ->where('status', 'chưa thanh toán')
             ->orderBy('hoa_don_id', 'desc')
             ->first();
 
+        // Trả về mảng chứa hóa đơn nếu tìm thấy, ngược lại trả về mảng rỗng
         return response()->json(['data' => $bill ? [$bill] : []]);
     }
 }

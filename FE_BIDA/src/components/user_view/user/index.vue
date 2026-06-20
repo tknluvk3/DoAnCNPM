@@ -4,7 +4,7 @@
         <div class="row mt-3">
             <div class="col-12 col-lg-4">
                 <div class="card radius-10 bg-primary">
-                    <div class="card-body">
+                    <div class="card-body" @click="showAll()" style="cursor: pointer;">
                         <div class="d-flex align-items-center">
                             <div class="text-white">
                                 <p class="mb-0">Tổng số bàn</p>
@@ -17,7 +17,7 @@
             </div>
             <div class="col-12 col-lg-4">
                 <div class="card radius-10 bg-success">
-                    <div class="card-body">
+                    <div class="card-body" @click="filterStatus(1)" style="cursor: pointer;">
                         <div class="d-flex align-items-center">
                             <div class="text-white">
                                 <p class="mb-0">Bàn trống</p>
@@ -30,7 +30,7 @@
             </div>
             <div class="col-12 col-lg-4">
                 <div class="card radius-10 bg-danger">
-                    <div class="card-body">
+                    <div class="card-body" @click="filterStatus(2)" style="cursor: pointer;">
                         <div class="d-flex align-items-center">
                             <div class="text-white">
                                 <p class="mb-0">Bàn đang sử dụng</p>
@@ -104,12 +104,14 @@ export default {
         this.getBanData();
     },
     methods: {
+        // Lấy dữ liệu bàn từ API
         getBanData() {
             this.loading = true;
             axios.get('http://127.0.0.1:8000/api/admin/ban/get-data')
                 .then((res) => {
                     console.log('Dữ liệu bàn:', res.data);
                     if (res.data.data) {
+                        // Chuyển đổi dữ liệu từ API sang định dạng phù hợp
                         this.tableList = res.data.data.map(item => ({
                             id: item.ban_id,
                             name: item.ban_name,
@@ -127,12 +129,22 @@ export default {
                     this.loading = false;
                 });
         },
+        
+        // Lọc danh sách bàn theo tầng
         filterTang(tang) {
             if (tang) {
                 this.filteredTang = this.tableList.filter(item => item.tang === tang);
             } else {
                 this.filteredTang = this.tableList;
             }
+        },
+        showAll() {
+            this.filteredTang = this.tableList;
+        },
+        filterStatus(status) {
+            this.filteredTang = this.tableList.filter(
+                item => item.status === status
+            );
         },
         allCount() {
             return this.tableList.length;
@@ -183,7 +195,9 @@ export default {
                             });
                         })
                         .then(() => {
+                            // Cập nhật lại dữ liệu bàn
                             this.getBanData();
+                            // Emit sự kiện chọn bàn để hiển thị panel
                             this.$emit('select-ban', ban);
                         })
                         .catch((error) => {
@@ -201,18 +215,25 @@ export default {
             this.$emit('select-ban', ban);
         },
         getHoaDonDetail() {
+            // Kiểm tra xem đã chọn bàn chưa
             if (!this.selectedBan) return;
+
+            // Gọi API để lấy thông tin hóa đơn theo ID bàn
             axios.get(`http://127.0.0.1:8000/api/admin/hoa-don/get-data?ban_id=${this.selectedBan.id}`)
                 .then((res) => {
+                    // Kiểm tra xem có dữ liệu hóa đơn không
                     if (res.data.data && res.data.data.length > 0) {
+                        // Nếu có, lấy hóa đơn đầu tiên và gọi API lấy chi tiết
                         this.hoaDon = res.data.data[0];
                         this.getChiTietHoaDon();
                     } else {
+                        // Nếu không có hóa đơn, reset dữ liệu
                         this.hoaDon = null;
                         this.chiTietHoaDon = [];
                     }
                 })
                 .catch((error) => {
+                    // Xử lý lỗi nếu có
                     console.error('Lỗi khi lấy hóa đơn:', error);
                 });
         }

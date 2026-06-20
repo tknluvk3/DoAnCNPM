@@ -35,7 +35,7 @@
                     </router-link>
                 </li>
 				<li class="nav-item">
-                    <router-link class="nav-link" to="/user">
+                    <router-link class="nav-link" to="/user/dat-ban">
                         <div class="parent-icon">
                             <i class="bx bx-left-arrow-alt"></i>
                         </div>
